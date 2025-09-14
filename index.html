@@ -4,8 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Aurix Club Poster</title>
+
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome -->
   <script src="https://kit.fontawesome.com/4c5c65a6c2.js" crossorigin="anonymous"></script>
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -122,8 +127,8 @@
 
   <!-- Poster -->
   <div class="index">
+    <!-- NOTE: now uses /images/... (from public folder) -->
     <img src="/images/clublogo.jpeg" alt="Aurix Club Logo" class="club-logo">
-
     <h1 class="title">Aurix Club</h1>
     <p class="subtitle">INSPIRE BUILD GROW</p>
     <p class="details">
@@ -131,7 +136,9 @@
       Join us for cutting-edge projects, hackathons, workshops, and tech talks.<br>
       Together, we learn, build, and thrive 🚀
     </p>
-    </p><a href="https://smecaurix.vercel.app/" target="_blank"><button class="cta"><span>Join the Movement</span></button></a>
+    <a href="https://smecaurix.vercel.app/" target="_blank">
+      <button class="cta"><span>Join the Movement</span></button>
+    </a>
   </div>
   
   <!-- Background Script -->
@@ -166,7 +173,6 @@
         if (this.x < 0 || this.x > canvas.width) this.dx *= -1;
         if (this.y < 0 || this.y > canvas.height) this.dy *= -1;
 
-        // gentle repulsion when mouse moves near
         const distX = this.x - mouse.x;
         const distY = this.y - mouse.y;
         const dist = Math.sqrt(distX * distX + distY * distY);
