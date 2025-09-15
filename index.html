@@ -126,8 +126,7 @@
       Join us for cutting-edge projects, unanimous contests, bootcamps, and tech talks.<br>
       Together, we learn, build, and grow 🚀
     </p>
-    <a href="https://smecaurix.vercel.app/" target="_blank">
-      <button class="cta"><span>Join the Movement</span></button>
+    <button class="cta"><span>Join the Movement</span></button>
   </div>
 
   <script>
@@ -154,27 +153,22 @@
       ctx.shadowBlur = 15;
       ctx.shadowColor = "#00faff";
 
-      // draw horizontal lines
+      // Horizontal lines
       for (let y = 0; y <= rows; y++) {
         ctx.beginPath();
         for (let x = 0; x <= cols; x++) {
           let baseX = x * spacing;
           let baseY = y * spacing;
 
-          // wave distortion + mouse repulsion
           let dx = mouse.x - baseX;
           let dy = mouse.y - baseY;
           let dist = Math.sqrt(dx*dx + dy*dy);
-          let force = Math.min(150 / dist, 4);
-          let angle = Math.atan2(dy, dx);
 
-          let offsetX = Math.cos(angle) * force * 15;
-          let offsetY = Math.sin(angle) * force * 15;
+          // shrink factor (closer to mouse = smaller spacing)
+          let shrink = 1 - Math.min(200 / dist, 0.4);
 
-          let waveY = Math.sin(time/800 + x*0.4) * 8;
-
-          let newX = baseX - offsetX;
-          let newY = baseY + waveY - offsetY;
+          let newX = mouse.x + (baseX - mouse.x) * shrink;
+          let newY = mouse.y + (baseY - mouse.y) * shrink;
 
           if (x === 0) ctx.moveTo(newX, newY);
           else ctx.lineTo(newX, newY);
@@ -182,7 +176,7 @@
         ctx.stroke();
       }
 
-      // draw vertical lines
+      // Vertical lines
       for (let x = 0; x <= cols; x++) {
         ctx.beginPath();
         for (let y = 0; y <= rows; y++) {
@@ -192,16 +186,11 @@
           let dx = mouse.x - baseX;
           let dy = mouse.y - baseY;
           let dist = Math.sqrt(dx*dx + dy*dy);
-          let force = Math.min(150 / dist, 4);
-          let angle = Math.atan2(dy, dx);
 
-          let offsetX = Math.cos(angle) * force * 15;
-          let offsetY = Math.sin(angle) * force * 15;
+          let shrink = 1 - Math.min(200 / dist, 0.4);
 
-          let waveX = Math.cos(time/800 + y*0.4) * 8;
-
-          let newX = baseX + waveX - offsetX;
-          let newY = baseY - offsetY;
+          let newX = mouse.x + (baseX - mouse.x) * shrink;
+          let newY = mouse.y + (baseY - mouse.y) * shrink;
 
           if (y === 0) ctx.moveTo(newX, newY);
           else ctx.lineTo(newX, newY);
