@@ -4,13 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Aurix Club Poster</title>
-
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-
-  <!-- FontAwesome -->
   <script src="https://kit.fontawesome.com/4c5c65a6c2.js" crossorigin="anonymous"></script>
-
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -27,7 +22,6 @@
       position: relative;
     }
 
-    /* Canvas background */
     canvas#bg {
       position: fixed;
       top: 0; left: 0;
@@ -36,8 +30,7 @@
       z-index: 0;
     }
 
-    /* Poster content */
-    .index {
+    .poster {
       z-index: 2;
       padding: 30px 40px;
       background: rgba(0,0,0,0.55);
@@ -46,7 +39,7 @@
       box-shadow: 0 0 30px rgba(0,240,255,0.3);
     }
 
-    .clublogo {
+    .club-logo {
       width: 140px;
       height: 140px;
       border-radius: 50%;
@@ -122,101 +115,105 @@
   </style>
 </head>
 <body>
-  <!-- Interactive Canvas Background -->
   <canvas id="bg"></canvas>
 
-  <!-- Poster -->
-  <div class="index">
-    <!-- NOTE: now uses /images/... (from public folder) -->
-    <img src="/clublogo.jpeg" alt="Aurix Club Logo" class="clublogo">
-    <h1 class="title">Aurix Club</h1>
-    <p class="subtitle">INSPIRE BUILD GROW</p>
+  <div class="poster">
+    <img src="images/clublogo.jpeg" alt="Aurix Club Logo" class="club-logo">
+    <h1 class="title">Aurix</h1>
+    <p class="subtitle">Inspire. Build. Grow.</p>
     <p class="details">
       A futuristic hub for creators, builders, and visionaries.<br>
-      Join us for cutting-edge projects, hackathons, workshops, and tech talks.<br>
-      Together, we learn, build, and thrive 🚀
+      Join us for cutting-edge projects, unanimous contests, bootcamps, and tech talks.<br>
+      Together, we learn, build, and grow 🚀
     </p>
-    <a href="https://smecaurix.vercel.app/" target="_blank">
-      <button class="cta"><span>Join the Movement</span></button>
-    </a>
+    <button class="cta"><span>Join the Movement</span></button>
   </div>
-  
-  <!-- Background Script -->
+
   <script>
     const canvas = document.getElementById("bg");
     const ctx = canvas.getContext("2d");
-
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    let particles = [];
+    let spacing = 50;
+    let cols = Math.floor(canvas.width / spacing);
+    let rows = Math.floor(canvas.height / spacing);
+    let mouse = { x: canvas.width/2, y: canvas.height/2 };
 
-    class Particle {
-      constructor(x, y, r, color) {
-        this.x = x;
-        this.y = y;
-        this.r = r;
-        this.color = color;
-        this.dx = (Math.random() - 0.5) * 2;
-        this.dy = (Math.random() - 0.5) * 2;
-      }
-      draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2, false);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-      }
-      update(mouse) {
-        this.x += this.dx;
-        this.y += this.dy;
-
-        if (this.x < 0 || this.x > canvas.width) this.dx *= -1;
-        if (this.y < 0 || this.y > canvas.height) this.dy *= -1;
-
-        const distX = this.x - mouse.x;
-        const distY = this.y - mouse.y;
-        const dist = Math.sqrt(distX * distX + distY * distY);
-        if (dist < 120) {
-          this.x += distX / dist * 3;
-          this.y += distY / dist * 3;
-        }
-
-        this.draw();
-      }
-    }
-
-    function init() {
-      particles = [];
-      for (let i = 0; i < 120; i++) {
-        let x = Math.random() * canvas.width;
-        let y = Math.random() * canvas.height;
-        let r = Math.random() * 6 + 2;
-        let colors = ["#00f6ff", "#00ffa0", "#5bb6ff", "#fffacd"];
-        let color = colors[Math.floor(Math.random() * colors.length)];
-        particles.push(new Particle(x, y, r, color));
-      }
-    }
-
-    let mouse = { x: null, y: null };
     window.addEventListener("mousemove", e => {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
     });
 
-    function animate() {
+    function drawGrid(time) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => p.update(mouse));
-      requestAnimationFrame(animate);
+
+      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = "rgba(0,255,255,0.6)";
+      ctx.shadowBlur = 15;
+      ctx.shadowColor = "#00faff";
+
+      // draw horizontal lines
+      for (let y = 0; y <= rows; y++) {
+        ctx.beginPath();
+        for (let x = 0; x <= cols; x++) {
+          let baseX = x * spacing;
+          let baseY = y * spacing;
+
+          // wave distortion + mouse repulsion
+          let dx = mouse.x - baseX;
+          let dy = mouse.y - baseY;
+          let dist = Math.sqrt(dx*dx + dy*dy);
+          let force = Math.min(150 / dist, 4);
+          let angle = Math.atan2(dy, dx);
+
+          let offsetX = Math.cos(angle) * force * 15;
+          let offsetY = Math.sin(angle) * force * 15;
+
+          let waveY = Math.sin(time/800 + x*0.4) * 8;
+
+          let newX = baseX - offsetX;
+          let newY = baseY + waveY - offsetY;
+
+          if (x === 0) ctx.moveTo(newX, newY);
+          else ctx.lineTo(newX, newY);
+        }
+        ctx.stroke();
+      }
+
+      // draw vertical lines
+      for (let x = 0; x <= cols; x++) {
+        ctx.beginPath();
+        for (let y = 0; y <= rows; y++) {
+          let baseX = x * spacing;
+          let baseY = y * spacing;
+
+          let dx = mouse.x - baseX;
+          let dy = mouse.y - baseY;
+          let dist = Math.sqrt(dx*dx + dy*dy);
+          let force = Math.min(150 / dist, 4);
+          let angle = Math.atan2(dy, dx);
+
+          let offsetX = Math.cos(angle) * force * 15;
+          let offsetY = Math.sin(angle) * force * 15;
+
+          let waveX = Math.cos(time/800 + y*0.4) * 8;
+
+          let newX = baseX + waveX - offsetX;
+          let newY = baseY - offsetY;
+
+          if (y === 0) ctx.moveTo(newX, newY);
+          else ctx.lineTo(newX, newY);
+        }
+        ctx.stroke();
+      }
+
+      requestAnimationFrame(drawGrid);
     }
 
-    window.addEventListener("resize", () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      init();
-    });
+    drawGrid(0);
 
-    init();
-    animate();
+    window.addEventListener("resize", () => location.reload());
   </script>
 </body>
 </html>
